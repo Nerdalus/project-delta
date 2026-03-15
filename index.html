@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TyreScan — Check Your Tyre Age & Size</title>
+  <meta name="description" content="Find out how old your tyres are and what your tyre size means. Enter your DOT code or tyre size for an instant safety check and replacement quotes.">
+  <meta property="og:title" content="TyreScan — Check Your Tyre Age & Size">
+  <meta property="og:description" content="Instant tyre age checker. Enter your DOT code to find out if your tyres are safe — and find replacements at the best price.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://tyrescan.app">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --red: #E5151C;
+      --red-dark: #B50F14;
+      --red-dim: rgba(229,21,28,0.12);
+      --black: #0A0A0A;
+      --surface: #141414;
+      --surface-2: #1E1E1E;
+      --surface-3: #272727;
+      --border: rgba(255,255,255,0.08);
+      --border-strong: rgba(255,255,255,0.15);
+      --text: #F5F5F5;
+      --text-muted: #888;
+      --text-dim: #555;
+      --amber: #F59E0B;
+      --green: #22C55E;
+      --font: 'Inter', sans-serif;
+      --radius: 12px;
+      --radius-sm: 8px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font);
+      background: var(--black);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* NAV */
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      background: rgba(10,10,10,0.92);
+      backdrop-filter: blur(12px);
+      z-index: 100;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+
+    .logo-icon {
+      width: 32px;
+      height: 32px;
+      background: var(--red);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo-icon svg { width: 18px; height: 18px; }
+
+    .logo-text {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.03em;
+    }
+
+    .logo-text span { color: var(--red); }
+
+    .nav-badge {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--red);
+      border: 1px solid var(--red);
+      padding: 3px 10px;
+      border-radius: 20px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    /* HERO */
+    .hero {
+      padding: 64px 24px 48px;
+      text-align: center;
+      max-width: 680px;
+      margin: 0 auto;
+    }
+
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--red);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+
+    .hero-tag::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      background: var(--red);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    h1 {
+      font-size: clamp(32px, 6vw, 52px);
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+      margin-bottom: 16px;
+      color: var(--text);
+    }
+
+    h1 em {
+      font-style: normal;
+      color: var(--red);
+    }
+
+    .hero-sub {
+      font-size: 17px;
+      color: var(--text-muted);
+      max-width: 480px;
+      margin: 0 auto 40px;
+      line-height: 1.6;
+    }
+
+    /* TABS */
+    .tabs {
+      display: flex;
+      background: var(--surface-2);
+      border-radius: var(--radius);
+      padding: 4px;
+      margin-bottom: 0;
+      border: 1px solid var(--border);
+    }
+
+    .tab {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 500;
+      border-radius: calc(var(--radius) - 4px);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .tab.active {
+      background: var(--red);
+      color: #fff;
+      font-weight: 600;
+    }
+
+    /* TOOL CARD */
+    .tool-wrap {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 0 24px 80px;
+    }
+
+    .tool-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .tool-header {
+      padding: 24px 24px 0;
+    }
+
+    .tool-panel {
+      display: none;
+      padding: 24px;
+    }
+
+    .tool-panel.active { display: block; }
+
+    /* INPUTS */
+    .field { margin-bottom: 20px; }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .input-wrap { position: relative; }
+
+    input[type="text"] {
+      width: 100%;
+      background: var(--surface-3);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      padding: 16px 20px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      text-transform: uppercase;
+    }
+
+    input[type="text"]::placeholder {
+      color: var(--text-dim);
+      letter-spacing: 0.08em;
+    }
+
+    input[type="text"]:focus {
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px var(--red-dim);
+    }
+
+    .input-hint {
+      font-size: 12px;
+      color: var(--text-dim);
+      margin-top: 6px;
+    }
+
+    /* SIZE INPUTS */
+    .size-row {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr auto 1fr;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .size-sep {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-dim);
+      text-align: center;
+    }
+
+    .size-input {
+      width: 100%;
+      background: var(--surface-3);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      padding: 14px 12px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    .size-input:focus {
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px var(--red-dim);
+    }
+
+    .size-input::placeholder { color: var(--text-dim); }
+
+    .size-labels {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr auto 1fr;
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .size-label-item {
+      font-size: 11px;
+      color: var(--text-dim);
+      text-align: center;
+    }
+
+    .size-sep-space { /* spacer for separators */ }
+
+    /* BUTTON */
+    .btn {
+      width: 100%;
+      padding: 16px;
+      background: var(--red);
+      border: none;
+      border-radius: var(--radius-sm);
+      color: #fff;
+      font-family: var(--font);
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      margin-top: 4px;
+    }
+
+    .btn:hover { background: var(--red-dark); }
+    .btn:active { transform: scale(0.99); }
+
+    /* RESULTS */
+    .result {
+      display: none;
+      margin-top: 20px;
+      border-top: 1px solid var(--border);
+      padding-top: 20px;
+    }
+
+    .result.visible { display: block; }
+
+    .verdict-card {
+      border-radius: var(--radius-sm);
+      padding: 20px;
+      margin-bottom: 16px;
+      border: 1px solid transparent;
+    }
+
+    .verdict-card.safe { background: rgba(34,197,94,0.08); border-color: rgba(34,197,94,0.2); }
+    .verdict-card.monitor { background: rgba(245,158,11,0.08); border-color: rgba(245,158,11,0.2); }
+    .verdict-card.replace { background: rgba(229,21,28,0.08); border-color: rgba(229,21,28,0.3); }
+
+    .verdict-top {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .verdict-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .safe .verdict-dot { background: var(--green); }
+    .monitor .verdict-dot { background: var(--amber); }
+    .replace .verdict-dot { background: var(--red); }
+
+    .verdict-title {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .safe .verdict-title { color: var(--green); }
+    .monitor .verdict-title { color: var(--amber); }
+    .replace .verdict-title { color: var(--red); }
+
+    .verdict-age {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .verdict-age strong { color: var(--text); font-size: 15px; }
+
+    .verdict-reason {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* SIZE RESULT */
+    .size-breakdown {
+      background: var(--surface-2);
+      border-radius: var(--radius-sm);
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .size-breakdown-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-dim);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .size-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 6px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .size-item:last-child { border-bottom: none; }
+
+    .size-item-label { font-size: 13px; color: var(--text-muted); }
+    .size-item-value { font-size: 14px; font-weight: 600; color: var(--text); }
+
+    /* AFFILIATE */
+    .affiliate-btn {
+      display: block;
+      width: 100%;
+      padding: 16px;
+      background: var(--red);
+      border: none;
+      border-radius: var(--radius-sm);
+      color: #fff;
+      font-family: var(--font);
+      font-size: 15px;
+      font-weight: 700;
+      text-align: center;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background 0.2s;
+      margin-bottom: 10px;
+    }
+
+    .affiliate-btn:hover { background: var(--red-dark); }
+
+    .affiliate-btn.secondary {
+      background: transparent;
+      border: 1px solid var(--border-strong);
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .affiliate-btn.secondary:hover {
+      border-color: var(--text-muted);
+      color: var(--text);
+      background: transparent;
+    }
+
+    .affiliate-note {
+      font-size: 11px;
+      color: var(--text-dim);
+      text-align: center;
+      margin-top: 6px;
+    }
+
+    /* APP UPSELL */
+    .upsell {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      margin: 40px 0;
+      text-align: center;
+    }
+
+    .upsell-tag {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--red);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .upsell h3 {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+
+    .upsell p {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+
+    .notify-form {
+      display: flex;
+      gap: 8px;
+      max-width: 380px;
+      margin: 0 auto;
+    }
+
+    .notify-input {
+      flex: 1;
+      background: var(--surface-3);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 14px;
+      padding: 12px 16px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .notify-input:focus { border-color: var(--red); }
+    .notify-input::placeholder { color: var(--text-dim); }
+
+    .notify-btn {
+      padding: 12px 20px;
+      background: var(--red);
+      border: none;
+      border-radius: var(--radius-sm);
+      color: #fff;
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.2s;
+    }
+
+    .notify-btn:hover { background: var(--red-dark); }
+
+    .notify-success {
+      display: none;
+      font-size: 14px;
+      color: var(--green);
+      font-weight: 500;
+    }
+
+    /* SEO CONTENT */
+    .seo-section {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 0 24px 80px;
+    }
+
+    .seo-section h2 {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 16px;
+      margin-top: 48px;
+      color: var(--text);
+    }
+
+    .seo-section h3 {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 10px;
+      margin-top: 32px;
+      color: var(--text);
+    }
+
+    .seo-section p {
+      font-size: 15px;
+      color: var(--text-muted);
+      line-height: 1.7;
+      margin-bottom: 14px;
+    }
+
+    .seo-section strong { color: var(--text); }
+
+    .dot-diagram {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 20px;
+      margin: 20px 0;
+      font-family: 'Courier New', monospace;
+    }
+
+    .dot-code-display {
+      font-size: clamp(18px, 4vw, 28px);
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      color: var(--text);
+      margin-bottom: 12px;
+    }
+
+    .dot-segments {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+
+    .dot-seg {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 4px;
+      letter-spacing: 0.04em;
+    }
+
+    .dot-seg.prefix { background: var(--surface-3); color: var(--text-dim); }
+    .dot-seg.factory { background: rgba(245,158,11,0.12); color: var(--amber); }
+    .dot-seg.week { background: var(--red-dim); color: var(--red); }
+    .dot-seg.year { background: var(--red-dim); color: var(--red); }
+
+    .size-diagram {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 20px;
+      margin: 20px 0;
+    }
+
+    .size-display {
+      font-size: clamp(22px, 5vw, 36px);
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      margin-bottom: 16px;
+    }
+
+    .size-display .w { color: var(--red); }
+    .size-display .ar { color: var(--amber); }
+    .size-display .rim { color: var(--green); }
+    .size-display .sep { color: var(--text-dim); }
+
+    .size-legend {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 8px;
+    }
+
+    .size-legend-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 13px;
+    }
+
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      margin-top: 3px;
+    }
+
+    .legend-dot.red { background: var(--red); }
+    .legend-dot.amber { background: var(--amber); }
+    .legend-dot.green { background: var(--green); }
+
+    .legend-label { color: var(--text-muted); line-height: 1.4; }
+    .legend-label strong { color: var(--text); display: block; }
+
+    /* FAQ */
+    .faq-item {
+      border-bottom: 1px solid var(--border);
+      padding: 20px 0;
+    }
+
+    .faq-item:last-child { border-bottom: none; }
+
+    .faq-q {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 8px;
+      letter-spacing: -0.01em;
+    }
+
+    .faq-a {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 24px;
+      text-align: center;
+    }
+
+    .footer-logo {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-dim);
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
+    }
+
+    .footer-logo span { color: var(--red); }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 12px;
+    }
+
+    .footer-links a {
+      font-size: 12px;
+      color: var(--text-dim);
+      text-decoration: none;
+    }
+
+    .footer-links a:hover { color: var(--text-muted); }
+
+    .footer-sub {
+      font-size: 12px;
+      color: var(--text-dim);
+      margin-top: 4px;
+    }
+
+    /* ERROR */
+    .error-msg {
+      display: none;
+      font-size: 13px;
+      color: var(--red);
+      margin-top: 6px;
+      font-weight: 500;
+    }
+
+    .error-msg.visible { display: block; }
+
+    @media (max-width: 480px) {
+      .size-row { grid-template-columns: 1fr auto 1fr auto 1fr; gap: 4px; }
+      .size-input { font-size: 16px; padding: 12px 6px; }
+      .notify-form { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="/" class="logo">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round">
+          <circle cx="12" cy="12" r="9"/>
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M12 3v2M12 19v2M3 12h2M19 12h2"/>
+        </svg>
+      </div>
+      <span class="logo-text">Tyre<span>Scan</span></span>
+    </a>
+    <div class="nav-badge">Free Tool</div>
+  </nav>
+
+  <div class="hero">
+    <div class="hero-tag">Instant tyre check</div>
+    <h1>Are your tyres <em>safe?</em></h1>
+    <p class="hero-sub">Check your tyre age from the DOT code, or decode your tyre size — and find replacements at the best price.</p>
+  </div>
+
+  <div class="tool-wrap">
+    <div class="tool-card">
+      <div class="tool-header">
+        <div class="tabs">
+          <button class="tab active" onclick="switchTab('dot')">DOT Age Check</button>
+          <button class="tab" onclick="switchTab('size')">Tyre Size Decoder</button>
+        </div>
+      </div>
+
+      <!-- DOT PANEL -->
+      <div class="tool-panel active" id="panel-dot">
+        <div class="field">
+          <label>Last 4 digits of DOT code</label>
+          <div class="input-wrap">
+            <input type="text" id="dot-input" maxlength="4" placeholder="2319" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+          </div>
+          <div class="error-msg" id="dot-error">Please enter the last 4 digits of your DOT code (e.g. 2319)</div>
+          <div class="input-hint">Found on the tyre sidewall after the letters "DOT" — use only the final 4 digits</div>
+        </div>
+        <button class="btn" onclick="checkDOT()">Check Tyre Age</button>
+
+        <div class="result" id="dot-result">
+          <div class="verdict-card" id="dot-verdict">
+            <div class="verdict-top">
+              <div class="verdict-dot"></div>
+              <div class="verdict-title" id="dot-verdict-title"></div>
+            </div>
+            <div class="verdict-age" id="dot-verdict-age"></div>
+            <div class="verdict-reason" id="dot-verdict-reason"></div>
+          </div>
+          <a class="affiliate-btn" id="dot-affiliate" href="#" target="_blank" rel="noopener">Find Replacement Tyres →</a>
+          <p class="affiliate-note">Prices from Blackcircles, Halfords &amp; more. Free fitting available.</p>
+        </div>
+      </div>
+
+      <!-- SIZE PANEL -->
+      <div class="tool-panel" id="panel-size">
+        <div class="field">
+          <label>Enter your tyre size</label>
+          <div class="size-row">
+            <input type="text" class="size-input" id="size-width" maxlength="3" placeholder="205" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+            <div class="size-sep">/</div>
+            <input type="text" class="size-input" id="size-ratio" maxlength="2" placeholder="55" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+            <div class="size-sep">R</div>
+            <input type="text" class="size-input" id="size-rim" maxlength="2" placeholder="16" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+          </div>
+          <div class="size-labels">
+            <div class="size-label-item">Width (mm)</div>
+            <div class="size-sep-space"></div>
+            <div class="size-label-item">Profile (%)</div>
+            <div class="size-sep-space"></div>
+            <div class="size-label-item">Rim (inch)</div>
+          </div>
+          <div class="error-msg" id="size-error">Please enter all three parts of your tyre size</div>
+        </div>
+        <button class="btn" onclick="checkSize()">Decode Tyre Size</button>
+
+        <div class="result" id="size-result">
+          <div class="size-breakdown">
+            <div class="size-breakdown-title">What your tyre size means</div>
+            <div class="size-item">
+              <span class="size-item-label">Tyre width</span>
+              <span class="size-item-value" id="res-width">—</span>
+            </div>
+            <div class="size-item">
+              <span class="size-item-label">Sidewall height</span>
+              <span class="size-item-value" id="res-height">—</span>
+            </div>
+            <div class="size-item">
+              <span class="size-item-label">Rim diameter</span>
+              <span class="size-item-value" id="res-rim">—</span>
+            </div>
+            <div class="size-item">
+              <span class="size-item-label">Overall tyre diameter</span>
+              <span class="size-item-value" id="res-diameter">—</span>
+            </div>
+          </div>
+          <a class="affiliate-btn" id="size-affiliate" href="#" target="_blank" rel="noopener">Find These Tyres →</a>
+          <a class="affiliate-btn secondary" id="size-affiliate-2" href="#" target="_blank" rel="noopener">Compare Prices at Halfords</a>
+          <p class="affiliate-note">Exact size match. Free fitting available at hundreds of UK locations.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- APP UPSELL -->
+    <div class="upsell">
+      <div class="upsell-tag">Coming soon — Android &amp; iOS</div>
+      <h3>Scan your tyre wall with your phone</h3>
+      <p>The TyreScan app reads your DOT code and tyre size automatically using your camera. No typing — just point and scan.</p>
+      <div class="notify-form">
+        <input type="email" class="notify-input" id="notify-email" placeholder="your@email.com">
+        <button class="notify-btn" onclick="notifyMe()">Notify Me</button>
+      </div>
+      <div class="notify-success" id="notify-success">✓ You're on the list. We'll let you know when the app launches.</div>
+    </div>
+  </div>
+
+  <!-- SEO CONTENT -->
+  <div class="seo-section">
+
+    <h2>How to find your DOT code</h2>
+    <p>Every tyre sold in the UK has a DOT code moulded into the sidewall. Look for the letters <strong>DOT</strong> followed by a series of letters and numbers. The last four digits are the ones you need — they tell you exactly when the tyre was made.</p>
+
+    <div class="dot-diagram">
+      <div class="dot-code-display">DOT&nbsp;U2LL&nbsp;LMLR&nbsp;2319</div>
+      <div class="dot-segments">
+        <span class="dot-seg prefix">DOT — compliance mark</span>
+        <span class="dot-seg factory">U2LL — factory code</span>
+        <span class="dot-seg factory">LMLR — tyre code</span>
+        <span class="dot-seg week">23 — week 23</span>
+        <span class="dot-seg year">19 — year 2019</span>
+      </div>
+    </div>
+
+    <p>The DOT code above shows a tyre made in the <strong>23rd week of 2019</strong>. Only the last four digits matter for age checking — ignore everything before them.</p>
+
+    <h2>How to read your tyre size</h2>
+    <p>Your tyre size is printed on the sidewall in a standard format used worldwide. Here's what each number means:</p>
+
+    <div class="size-diagram">
+      <div class="size-display">
+        <span class="w">205</span><span class="sep">/</span><span class="ar">55</span><span class="sep"> R</span><span class="rim">16</span>
+      </div>
+      <div class="size-legend">
+        <div class="size-legend-item">
+          <div class="legend-dot red"></div>
+          <div class="legend-label"><strong>205 — Width</strong>The tyre is 205mm wide</div>
+        </div>
+        <div class="size-legend-item">
+          <div class="legend-dot amber"></div>
+          <div class="legend-label"><strong>55 — Aspect ratio</strong>Sidewall is 55% of width</div>
+        </div>
+        <div class="size-legend-item">
+          <div class="legend-dot green"></div>
+          <div class="legend-label"><strong>16 — Rim diameter</strong>Fits a 16 inch wheel</div>
+        </div>
+      </div>
+    </div>
+
+    <h2>How old is too old for tyres?</h2>
+    <p>Tyre rubber degrades over time even if the tread looks fine. Heat, UV light, and oxidation cause the rubber to harden and crack from the inside — which you can't see from the surface.</p>
+    <p>Most tyre manufacturers and the RAC recommend:</p>
+    <h3>Under 5 years — Safe</h3>
+    <p>Your tyres are within their expected lifespan. Continue with regular tread depth checks and visual inspections for cracking or bulges.</p>
+    <h3>5 to 7 years — Monitor closely</h3>
+    <p>Tyres in this range should be <strong>inspected by a qualified tyre fitter</strong> annually. Look out for sidewall cracking, which is a sign of rubber degradation. Consider replacing sooner if the vehicle is used heavily.</p>
+    <h3>Over 7 years — Replace</h3>
+    <p>Most manufacturers recommend replacing tyres at this age regardless of tread depth. The structural integrity of the tyre may be compromised, increasing the risk of a blowout especially at motorway speeds.</p>
+    <p><strong>Note:</strong> Some manufacturers set their limit at 6 years, others at 10. When in doubt, ask a tyre fitter to inspect them.</p>
+
+    <h2>Frequently asked questions</h2>
+
+    <div class="faq-item">
+      <div class="faq-q">Can I use my tyre if the tread is fine but it's over 7 years old?</div>
+      <div class="faq-a">Legally yes — UK law only specifies minimum tread depth (1.6mm). But most tyre manufacturers and motoring organisations recommend replacement after 7 years regardless of tread. Old rubber loses elasticity and can fail without warning, especially at speed.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">What if my DOT code only has 3 digits at the end?</div>
+      <div class="faq-a">Three-digit DOT codes were used on tyres made before 2000. If your tyre has a 3-digit code, it is over 25 years old and should be replaced immediately.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">Do spare tyres age the same way?</div>
+      <div class="faq-a">Yes. A spare tyre that has never been used still ages from the moment it was made. Always check the DOT code on your spare — many are dangerously old without the owner realising.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">Where exactly is the DOT code on the tyre?</div>
+      <div class="faq-a">Look on the inner or outer sidewall of the tyre for the letters DOT followed by a sequence of letters and numbers. It may be on one side only. You may need to crouch down and look carefully — it can be small and hard to read, especially on darker or older tyres.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">Are tyre size codes universal?</div>
+      <div class="faq-a">Yes — the width/profile/rim format (e.g. 205/55 R16) is an international standard used worldwide. You'll see the same format on tyres from every manufacturer in every country.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">How often should I check my tyres?</div>
+      <div class="faq-a">Check tread depth and tyre pressure monthly. Do a visual check for cracking, bulges, or foreign objects every time you wash the car. A full inspection including age check once a year.</div>
+    </div>
+
+  </div>
+
+  <footer>
+    <div class="footer-logo">Tyre<span>Scan</span></div>
+    <div class="footer-sub">A free tool by <a href="https://alphapariah.studio" style="color:var(--text-dim);text-decoration:none;">Alpha Pariah Studios</a></div>
+    <div class="footer-links">
+      <a href="#tool">Check DOT Age</a>
+      <a href="#tool">Decode Tyre Size</a>
+      <a href="https://motreminder.app">MOTReminder</a>
+    </div>
+  </footer>
+
+  <script>
+    function switchTab(tab) {
+      document.querySelectorAll('.tab').forEach((t, i) => {
+        t.classList.toggle('active', (i === 0 && tab === 'dot') || (i === 1 && tab === 'size'));
+      });
+      document.getElementById('panel-dot').classList.toggle('active', tab === 'dot');
+      document.getElementById('panel-size').classList.toggle('active', tab === 'size');
+    }
+
+    function checkDOT() {
+      const val = document.getElementById('dot-input').value.trim();
+      const err = document.getElementById('dot-error');
+      const result = document.getElementById('dot-result');
+
+      if (val.length !== 4 || isNaN(val)) {
+        err.classList.add('visible');
+        result.classList.remove('visible');
+        return;
+      }
+      err.classList.remove('visible');
+
+      const week = parseInt(val.substring(0, 2));
+      const year = parseInt('20' + val.substring(2, 4));
+
+      if (week < 1 || week > 53) {
+        err.textContent = 'Week number must be between 01 and 53';
+        err.classList.add('visible');
+        return;
+      }
+
+      const now = new Date();
+      const tyreDate = new Date(year, 0, 1 + (week - 1) * 7);
+      const ageMs = now - tyreDate;
+      const ageYears = ageMs / (1000 * 60 * 60 * 24 * 365.25);
+      const ageRounded = Math.floor(ageYears * 10) / 10;
+
+      const madeText = `Week ${week} of ${year}`;
+      const ageText = ageRounded < 1
+        ? `Less than 1 year old`
+        : `${ageRounded.toFixed(1)} years old`;
+
+      const verdict = document.getElementById('dot-verdict');
+      const title = document.getElementById('dot-verdict-title');
+      const age = document.getElementById('dot-verdict-age');
+      const reason = document.getElementById('dot-verdict-reason');
+      const affiliateBtn = document.getElementById('dot-affiliate');
+
+      verdict.className = 'verdict-card';
+      age.innerHTML = `Made: <strong>${madeText}</strong> &nbsp;·&nbsp; Age: <strong>${ageText}</strong>`;
+
+      if (ageYears < 5) {
+        verdict.classList.add('safe');
+        title.textContent = 'Tyres are safe';
+        reason.textContent = 'Your tyres are within their expected lifespan. Keep checking tread depth monthly and look out for any cracking or bulges on the sidewall.';
+        affiliateBtn.textContent = 'Browse Tyres for When You Need Them →';
+      } else if (ageYears < 7) {
+        verdict.classList.add('monitor');
+        title.textContent = 'Monitor closely';
+        reason.textContent = 'Your tyres are approaching the age where rubber degradation becomes a concern. Have them inspected by a tyre fitter and consider replacing soon, especially if the vehicle is used at high speeds.';
+        affiliateBtn.textContent = 'Find Replacement Tyres →';
+      } else {
+        verdict.classList.add('replace');
+        title.textContent = 'Replacement recommended';
+        reason.textContent = 'Most tyre manufacturers recommend replacement after 7 years regardless of tread depth. Old rubber loses elasticity and can fail without warning. Replace these tyres as soon as possible.';
+        affiliateBtn.textContent = 'Find Replacement Tyres Now →';
+      }
+
+      affiliateBtn.href = 'https://www.blackcircles.com/';
+      result.classList.add('visible');
+      result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function checkSize() {
+      const width = document.getElementById('size-width').value.trim();
+      const ratio = document.getElementById('size-ratio').value.trim();
+      const rim = document.getElementById('size-rim').value.trim();
+      const err = document.getElementById('size-error');
+      const result = document.getElementById('size-result');
+
+      if (!width || !ratio || !rim) {
+        err.classList.add('visible');
+        result.classList.remove('visible');
+        return;
+      }
+      err.classList.remove('visible');
+
+      const w = parseInt(width);
+      const r = parseInt(ratio);
+      const d = parseInt(rim);
+
+      const sidewall = Math.round((w * r) / 100);
+      const diameter = Math.round(d * 25.4 + sidewall * 2);
+
+      document.getElementById('res-width').textContent = `${w}mm`;
+      document.getElementById('res-height').textContent = `${sidewall}mm`;
+      document.getElementById('res-rim').textContent = `${d} inch`;
+      document.getElementById('res-diameter').textContent = `~${diameter}mm`;
+
+      const sizeStr = `${w}-${r}-R${d}`;
+      const bcUrl = `https://www.blackcircles.com/tyres/search?width=${w}&profile=${r}&rim=${d}`;
+      const halfordsUrl = `https://www.halfords.com/tyres/?width=${w}&profile=${r}&rim=${d}`;
+
+      document.getElementById('size-affiliate').href = bcUrl;
+      document.getElementById('size-affiliate-2').href = halfordsUrl;
+
+      result.classList.add('visible');
+      result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function notifyMe() {
+      const email = document.getElementById('notify-email').value.trim();
+      const success = document.getElementById('notify-success');
+      const form = document.querySelector('.notify-form');
+      if (!email || !email.includes('@')) return;
+      form.style.display = 'none';
+      success.style.display = 'block';
+    }
+
+    document.getElementById('dot-input').addEventListener('keydown', e => {
+      if (e.key === 'Enter') checkDOT();
+    });
+  </script>
+</body>
+</html>
