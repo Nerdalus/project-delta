@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://www.motreminder.app/sitemap.xml
